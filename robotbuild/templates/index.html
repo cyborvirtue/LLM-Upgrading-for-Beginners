@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>豆包AI对话</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>豆包AI</h1>
+            </div>
+            <div class="sidebar-content">
+                <button id="new-chat" class="new-chat-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    新对话
+                </button>
+                <div class="sidebar-options">
+                    <div class="mode-selector">
+                        <span class="mode-label">对话模式:</span>
+                        <div class="mode-toggle">
+                            <button id="langchain-mode" class="mode-btn active">LangChain</button>
+                            <button id="native-mode" class="mode-btn">原生</button>
+                        </div>
+                    </div>
+                    <button id="clear-history" class="sidebar-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        清空历史
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <a href="#" id="show-help" class="help-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    帮助 & 命令
+                </a>
+                <span class="version">v1.0.0</span>
+            </div>
+        </aside>
+        
+        <main class="chat-area">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="status-indicator">
+                        <span class="status-dot online"></span>
+                        <span class="status-text">在线</span>
+                    </div>
+                    <div class="current-mode">
+                        模式: <span id="current-mode">LangChain</span>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message system">
+                        <div class="message-avatar system-avatar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender">系统</span>
+                            </div>
+                            <div class="message-body">
+                                <p>欢迎使用豆包AI对话系统！您可以通过以下命令控制系统:</p>
+                                <ul>
+                                    <li><code>/clear</code> - 清除对话历史</li>
+                                    <li><code>/mode</code> - 切换对话模式</li>
+                                    <li><code>/status</code> - 显示当前状态</li>
+                                </ul>
+                                <p>快来开始对话吧！</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <textarea id="user-input" placeholder="输入您的问题或命令..." rows="1"></textarea>
+                    <button id="send-button" class="send-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>帮助 & 命令</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h3>可用命令</h3>
+                <table class="commands-table">
+                    <tr>
+                        <td><code>/clear</code></td>
+                        <td>清除当前对话历史</td>
+                    </tr>
+                    <tr>
+                        <td><code>/mode</code></td>
+                        <td>在LangChain和原生模式间切换</td>
+                    </tr>
+                    <tr>
+                        <td><code>/status</code></td>
+                        <td>显示当前状态信息</td>
+                    </tr>
+                </table>
+                
+                <h3>快捷键</h3>
+                <table class="shortcuts-table">
+                    <tr>
+                        <td><kbd>Enter</kbd></td>
+                        <td>发送消息</td>
+                    </tr>
+                    <tr>
+                        <td><kbd>Shift</kbd> + <kbd>Enter</kbd></td>
+                        <td>换行</td>
+                    </tr>
+                    <tr>
+                        <td><kbd>Esc</kbd></td>
+                        <td>关闭帮助</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>
